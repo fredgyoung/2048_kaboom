@@ -16,10 +16,10 @@ loadSprite("two", "two.png")
 // let board = Array(4).fill().map(() => Array(4).fill(0));
 // For testing purposes only
 let board = [
-	[2,2,4,4],
-	[2,4,4,2],
-	[2,2,2,2],
-	[2,4,2,4]
+	[0,0,0,0],
+	[0,0,0,0],
+	[0,0,0,0],
+	[0,0,0,0],
 ]
 
 // with options
@@ -89,6 +89,18 @@ function mergeSimilarNumbers(arr) {
 	return arr;
 }
 
+// Rotate matrix 90, 180, or 270 degrees 
+function rotate4x4MatrixRight(oldArray, times) {
+	newArray = Array(4).fill().map(() => Array(4).fill(0));
+	// new col = 3 - old row
+	// new row = old col
+	for (let row=0; row<4; row++) {
+		for (let col=0; row<4; row++) {
+			newArray[row][col] = oldArray[col][3-row]
+		}	
+	}
+}
+
 // Move functions
 function moveLeft() {
 	for (let row=0; row<4; row++) {
@@ -100,23 +112,45 @@ function moveLeft() {
 	}
 }
 
-console.log("Before: ", board);
-moveLeft();
-console.log("After: ", board);
-
 function moveRight() {
-	// TODO
+	for (let row=0; row<4; row++) {
+		let temp = board[row].reverse();
+		temp = shiftNumbersLeft(temp);
+		temp = mergeSimilarNumbers(temp);
+		temp = shiftNumbersLeft(temp);
+		board[row] = temp.reverse();
+	}
 }
 
 function moveUp() {
-	// TODO
+	for (let col=0; col<4; col++) {
+		let temp = Array();
+		for (let row=0; row<4; row++) {
+			temp.push(board[row][col]);
+		}
+		temp = shiftNumbersLeft(temp);
+		temp = mergeSimilarNumbers(temp);
+		temp = shiftNumbersLeft(temp);
+		for (let row=0; row<4; row++) {
+			board[row][col] = temp[row];
+		}
+	}
 }
 
 function moveDown() {
-	// TODO
+	for (let col=0; col<4; col++) {
+		let temp = Array();
+		for (let row=3; row>-1; row--) {
+			temp.push(board[row][col]);
+		}
+		temp = shiftNumbersLeft(temp);
+		temp = mergeSimilarNumbers(temp);
+		temp = shiftNumbersLeft(temp);
+		for (let row=3; row>-1; row--) {
+			board[row][col] = temp[3-row];
+		}
+	}
 }
-
-
 
 // Event Listeners
 onKeyPress("up", () => {
@@ -138,4 +172,44 @@ onKeyPress("right", () => {
 drawGrid();
 drawTiles();
 
+function boardFull() {
+	for (let row=0; row<4; row++) {
+		for (let col=0; col<4; col++) {
+			if (board[row][col] === 0) {
+				return false;
+			}
+		}	
+	}
+	console.log("board full");
+	return true;
+}
+
+function printBoard() {
+	for (let row=0; row<4; row++) {
+		console.log(board[row]);
+	}
+}
+
+function addRandomTile() {
+	if (!boardFull()) {
+		// 90% chance of 2. 10% chance of 4
+		let val = Math.random() < 0.9 ? 2 : 4;
+		while (true) {
+			let row = Math.floor(Math.random()*4);
+			let col = Math.floor(Math.random()*4);
+			if (board[row][col] === 0) {
+				board[row][col] = val;
+				console.log("adding: ", row, col, val)
+				break;
+			}
+		}
+	}
+}
+
+printBoard()
+
+while (!boardFull()) {
+	addRandomTile();
+	printBoard()
+}
 

@@ -11,7 +11,25 @@ kaboom({
 });
 
 loadRoot("sprites/");
-loadSprite("two", "two.png")
+loadSprite("two", "two.png");
+loadSprite("four", "four.png");
+loadSprite("eight", "eight.png");
+loadSprite("onesix", "onesix.png");
+loadSprite("threetwo", "threetwo.png");
+loadSprite("sixfour", "sixfour.png");
+loadSprite("onetwoeight", "onetwoeight.png");
+loadSprite("twofivesix", "twofivesix.png");
+
+const spriteMap = new Map([
+	[2, "two"],
+	[4, "four"],
+	[8, "eight"],
+	[16, "onesix"],
+	[32, "threetwo"],
+	[64, "sixfour"],
+	[128, "onetwoeight"],
+	[256, "twofivesix"],
+]);
 
 // let board = Array(4).fill().map(() => Array(4).fill(0));
 // For testing purposes only
@@ -29,6 +47,23 @@ let coordinates = [
 	[[750, 110], [750, 210], [750, 310], [750, 410]]
 ]
 
+class Tile {
+	constructor(row, col, val) {
+		this.row = row
+		this.col = col
+		this.val - val
+	}
+
+	slide(newRow, newCol) {
+		this.row = newRow
+		this.col = newCol
+	}
+
+	changeValue(newVal) {
+		this.value = newVal
+	}
+}
+
 /*
 for (let y = 0; y < 4; y++) {
 	for (let x = 0; x < 4; x++) {
@@ -42,23 +77,35 @@ for (let y = 0; y < 4; y++) {
 }	
 */
 
-// with options
+let score = 0;
+
 add([
-	pos(40, 40),
+	text("SCORE:", { size: 20, font: "sink" }),
+	pos(100, 40),
 	color(BLACK),
-	text("Score: 1234", {
-		size: 24,
-		width: 320, // it'll wrap to next line when width exceeds this value
-		font: "sans-serif", // specify any font you loaded or browser built-in
-	}),
-])
+	anchor("center"),
+	// layer("ui"),
+]);
+  
+const scoreText = add([
+	text("000000", { size: 20, font: "sink" }),
+	pos(200, 40),
+	color(BLACK),
+	anchor("center"),
+	// layer("ui"),
+]);
+  
+function updateScore(points) {
+	score += points;
+	scoreText.text = score.toString().padStart(6, "0");
+}
 
 function drawGrid() {
 
 	// Big Box
 	add([
-		pos(440, 100),
-		rect(400, 400),
+		pos(430, 90),
+		rect(420, 420, {radius: 10}),
 		color('#bbada0'),
 		area(),
 	])
@@ -68,7 +115,7 @@ function drawGrid() {
 		for (let x = 0; x < 4; x++) {
 			add([
 				pos(450 + x * 100, 110 + y * 100),
-				rect(80, 80),
+				rect(80, 80, {radius: 5}),
 				color(238, 228, 218),
 				area(),
 			])
@@ -77,15 +124,18 @@ function drawGrid() {
 }
 
 function drawTiles() {
+	destroyAll("tile")
 	for (let row=0; row<4; row++) {
 		for (let col=0; col<4; col++) {
 			if (board[row][col] > 0) {
+				const spriteName = spriteMap.get(board[row][col]);
 				add([
-					sprite("two"),
-					scale(1),
+					sprite(spriteName),
+					// scale(1),
 					anchor("center"),
 					pos(490 + col * 100,  150 + row * 100),
-					area(),
+					// area(),
+					"tile",
 				]);			
 			}
 		}
@@ -103,6 +153,7 @@ function mergeSimilarNumbers(arr) {
 	for (let i=0; i<4; i++) {
 		if (arr[i] == arr[i+1]) {
 			arr[i] *= 2;
+			updateScore(arr[i]);
 			arr[i+1] = 0;	
 		}
 	}
@@ -160,26 +211,36 @@ function moveDown() {
 	}
 }
 
+function updateGame() {
+	addRandomTile();
+	drawTiles();
+}
+
 // Event Listeners
 onKeyPress("up", () => {
 	moveUp();
+	updateGame();
 });
 
 onKeyPress("down", () => {
 	moveDown();
+	updateGame();
 });
 
 onKeyPress("left", () => {
 	moveLeft();
-	printBoard()
-	drawGrid();
-	drawTiles();
+	updateGame();
 });
 
 onKeyPress("right", () => {
 	moveRight();
+	updateGame();
 });
 
+/**
+ * 
+ * @returns boolean
+ */
 function boardFull() {
 	for (let row=0; row<4; row++) {
 		for (let col=0; col<4; col++) {
@@ -190,6 +251,27 @@ function boardFull() {
 	}
 	console.log("board full");
 	return true;
+}
+
+/**
+ * If the board is full and no similar numbers appear next to each other.
+ * 
+ * @returns boolean
+ */
+function gameOver() {
+	if (!boardFull) {return false};
+	for (let row=0; row<4; row++) {
+		for (let col=0; col<4; col++) {
+			// Compare right
+			if (col < 3 && board[row][col] == board[row][col+1]) {
+				return false;
+			}
+			// Compare down
+			if (row < 3 && board[row][col] == board[row+1][col]) {
+				return false;
+			}
+		}
+	}
 }
 
 function printBoard() {
@@ -214,10 +296,8 @@ function addRandomTile() {
 	}
 }
 
-for (let i=0; i<5; i++) {
-	addRandomTile();
-}
-printBoard()
+// Start Game
 drawGrid();
-drawTiles();
+addRandomTile();
+updateGame();
 

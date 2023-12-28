@@ -35,10 +35,10 @@ const spriteMap = new Map([
 // let board = Array(4).fill().map(() => Array(4).fill(0));
 // For testing purposes only
 let board = [
-	[0,0,0,0],
-	[0,0,0,0],
-	[0,0,0,0],
-	[0,0,0,0],
+	[0, 0, 0, 0],
+	[0, 0, 0, 0],
+	[0, 0, 0, 0],
+	[0, 0, 0, 0],
 ]
 
 let coordinates = [
@@ -47,7 +47,7 @@ let coordinates = [
 	[[650, 110], [650, 210], [650, 310], [650, 410]],
 	[[750, 110], [750, 210], [750, 310], [750, 410]]
 ]
-
+/*
 class Tile {
 	constructor(id, row, col, val) {
 		this.id = id
@@ -78,7 +78,7 @@ class Tile {
 		this.value = newVal
 	}
 }
-
+*/
 /*
 for (let y = 0; y < 4; y++) {
 	for (let x = 0; x < 4; x++) {
@@ -95,21 +95,21 @@ for (let y = 0; y < 4; y++) {
 let score = 0;
 
 add([
-	text("SCORE:", { size: 20, font: "sink" }),
+	text("SCORE", { size: 20, font: "sink" }),
 	pos(100, 40),
 	color(BLACK),
 	anchor("center"),
 	// layer("ui"),
 ]);
-  
+
 const scoreText = add([
 	text("000000", { size: 20, font: "sink" }),
-	pos(200, 40),
+	pos(100, 60),
 	color(BLACK),
 	anchor("center"),
 	// layer("ui"),
 ]);
-  
+
 function updateScore(points) {
 	score += points;
 	scoreText.text = score.toString().padStart(6, "0");
@@ -121,25 +121,27 @@ function drawBackground() {
 		anchor("center"),
 		scale(1),
 		pos(640, 300),
-	]);		
+	]);
 }
 
 function drawTiles() {
 	destroyAll("tile")
-	for (let row=0; row<4; row++) {
-		for (let col=0; col<4; col++) {
+	for (let row = 0; row < 4; row++) {
+		for (let col = 0; col < 4; col++) {
 			if (board[row][col] > 0) {
 				const spriteName = spriteMap.get(board[row][col]);
 				add([
 					sprite(spriteName),
 					anchor("center"),
-					pos(505 + col * 90,  165 + row * 90),
+					pos(505 + col * 90, 165 + row * 90),
 					fadeIn(0),
 					opacity(0),
-					// text("2"),
-					// area(),
+					{
+						row: row,
+						col: col,
+					},
 					"tile",
-				]);			
+				]);
 			}
 		}
 	}
@@ -148,16 +150,16 @@ function drawTiles() {
 function shiftNumbersLeft(arr) {
 	let originalLength = arr.length;
 	arr = arr.filter((e) => e != 0);
-	while (arr.length < originalLength) {arr.push(0)};
+	while (arr.length < originalLength) { arr.push(0) };
 	return arr;
 }
 
 function mergeSimilarNumbers(arr) {
-	for (let i=0; i<4; i++) {
-		if (arr[i] == arr[i+1]) {
+	for (let i = 0; i < 4; i++) {
+		if (arr[i] == arr[i + 1]) {
 			arr[i] *= 2;
 			updateScore(arr[i]);
-			arr[i+1] = 0;	
+			arr[i + 1] = 0;
 		}
 	}
 	return arr;
@@ -165,7 +167,7 @@ function mergeSimilarNumbers(arr) {
 
 // Move functions
 function moveLeft() {
-	for (let row=0; row<4; row++) {
+	for (let row = 0; row < 4; row++) {
 		let temp = board[row];
 		temp = shiftNumbersLeft(temp);
 		temp = mergeSimilarNumbers(temp);
@@ -175,7 +177,7 @@ function moveLeft() {
 }
 
 function moveRight() {
-	for (let row=0; row<4; row++) {
+	for (let row = 0; row < 4; row++) {
 		let temp = board[row].reverse();
 		temp = shiftNumbersLeft(temp);
 		temp = mergeSimilarNumbers(temp);
@@ -185,58 +187,58 @@ function moveRight() {
 }
 
 function moveUp() {
-	for (let col=0; col<4; col++) {
+	for (let col = 0; col < 4; col++) {
 		let temp = Array();
-		for (let row=0; row<4; row++) {
+		for (let row = 0; row < 4; row++) {
 			temp.push(board[row][col]);
 		}
 		temp = shiftNumbersLeft(temp);
 		temp = mergeSimilarNumbers(temp);
 		temp = shiftNumbersLeft(temp);
-		for (let row=0; row<4; row++) {
+		for (let row = 0; row < 4; row++) {
 			board[row][col] = temp[row];
 		}
 	}
 }
 
 function moveDown() {
-	for (let col=0; col<4; col++) {
+	for (let col = 0; col < 4; col++) {
 		let temp = Array();
-		for (let row=3; row>-1; row--) {
+		for (let row = 3; row > -1; row--) {
 			temp.push(board[row][col]);
 		}
 		temp = shiftNumbersLeft(temp);
 		temp = mergeSimilarNumbers(temp);
 		temp = shiftNumbersLeft(temp);
-		for (let row=3; row>-1; row--) {
-			board[row][col] = temp[3-row];
+		for (let row = 3; row > -1; row--) {
+			board[row][col] = temp[3 - row];
 		}
 	}
 }
 
 function updateGame() {
 	addRandomTile();
-	drawTiles();
+	// drawTiles();
 }
 
 // Event Listeners
 onKeyPress("up", () => {
-	moveUp();
+	//moveUp();
 	updateGame();
 });
 
 onKeyPress("down", () => {
-	moveDown();
+	//moveDown();
 	updateGame();
 });
 
 onKeyPress("left", () => {
-	moveLeft();
+	//moveLeft();
 	updateGame();
 });
 
 onKeyPress("right", () => {
-	moveRight();
+	//moveRight();
 	updateGame();
 });
 
@@ -245,12 +247,12 @@ onKeyPress("right", () => {
  * @returns boolean
  */
 function boardFull() {
-	for (let row=0; row<4; row++) {
-		for (let col=0; col<4; col++) {
+	for (let row = 0; row < 4; row++) {
+		for (let col = 0; col < 4; col++) {
 			if (board[row][col] === 0) {
 				return false;
 			}
-		}	
+		}
 	}
 	console.log("board full");
 	return true;
@@ -262,15 +264,15 @@ function boardFull() {
  * @returns boolean
  */
 function gameOver() {
-	if (!boardFull) {return false};
-	for (let row=0; row<4; row++) {
-		for (let col=0; col<4; col++) {
+	if (!boardFull) { return false };
+	for (let row = 0; row < 4; row++) {
+		for (let col = 0; col < 4; col++) {
 			// Compare right
-			if (col < 3 && board[row][col] == board[row][col+1]) {
+			if (col < 3 && board[row][col] == board[row][col + 1]) {
 				return false;
 			}
 			// Compare down
-			if (row < 3 && board[row][col] == board[row+1][col]) {
+			if (row < 3 && board[row][col] == board[row + 1][col]) {
 				return false;
 			}
 		}
@@ -278,21 +280,39 @@ function gameOver() {
 }
 
 function printBoard() {
-	for (let row=0; row<4; row++) {
+	for (let row = 0; row < 4; row++) {
 		console.log(board[row]);
 	}
+}
+
+function addTile(row, col, val) {
+	const spriteName = spriteMap.get(val);
+	board[row][col] = val;
+	add([
+		sprite(spriteName),
+		anchor("center"),
+		pos(505 + col * 90, 165 + row * 90),
+		fadeIn(1),
+		opacity(0),
+		{
+			row: row,
+			col: col,
+		},
+		"tile",
+	]);
 }
 
 function addRandomTile() {
 	if (!boardFull()) {
 		// 90% chance of 2. 10% chance of 4
-		let val = Math.random() < 0.9 ? 2 : 4;
+		const val = Math.random() < 0.9 ? 2 : 4;
 		while (true) {
-			let row = Math.floor(Math.random()*4);
-			let col = Math.floor(Math.random()*4);
+			let row = Math.floor(Math.random() * 4);
+			let col = Math.floor(Math.random() * 4);
 			if (board[row][col] === 0) {
 				board[row][col] = val;
 				console.log("adding: ", row, col, val)
+				addTile(row, col, val);
 				break;
 			}
 		}

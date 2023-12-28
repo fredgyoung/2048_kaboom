@@ -11,6 +11,7 @@ kaboom({
 });
 
 loadRoot("sprites/");
+loadSprite("background", "background.png")
 loadSprite("two", "two.png");
 loadSprite("four", "four.png");
 loadSprite("eight", "eight.png");
@@ -48,10 +49,24 @@ let coordinates = [
 ]
 
 class Tile {
-	constructor(row, col, val) {
+	constructor(id, row, col, val) {
+		this.id = id
 		this.row = row
 		this.col = col
 		this.val - val
+	}
+
+	create(spriteName) {
+		add([
+			sprite(spriteName),
+			anchor("center"),
+			pos(490 + col * 100,  150 + row * 100),
+			"tile",
+		]);			
+	}
+
+	destroy() {
+
 	}
 
 	slide(newRow, newCol) {
@@ -100,27 +115,13 @@ function updateScore(points) {
 	scoreText.text = score.toString().padStart(6, "0");
 }
 
-function drawGrid() {
-
-	// Big Box
+function drawBackground() {
 	add([
-		pos(430, 90),
-		rect(420, 420, {radius: 10}),
-		color('#bbada0'),
-		area(),
-	])
-
-	// Little Boxes
-	for (let y = 0; y < 4; y++) {
-		for (let x = 0; x < 4; x++) {
-			add([
-				pos(450 + x * 100, 110 + y * 100),
-				rect(80, 80, {radius: 5}),
-				color(238, 228, 218),
-				area(),
-			])
-		}
-	}	
+		sprite("background"),
+		anchor("center"),
+		scale(1),
+		pos(640, 300),
+	]);		
 }
 
 function drawTiles() {
@@ -131,9 +132,11 @@ function drawTiles() {
 				const spriteName = spriteMap.get(board[row][col]);
 				add([
 					sprite(spriteName),
-					// scale(1),
 					anchor("center"),
-					pos(490 + col * 100,  150 + row * 100),
+					pos(505 + col * 90,  165 + row * 90),
+					fadeIn(0),
+					opacity(0),
+					// text("2"),
 					// area(),
 					"tile",
 				]);			
@@ -297,7 +300,7 @@ function addRandomTile() {
 }
 
 // Start Game
-drawGrid();
+drawBackground();
 addRandomTile();
 updateGame();
 
